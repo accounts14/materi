@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IT: Dunia Solusi</title>
+    
+    <!-- Tailwind CSS for rapid styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: Space Grotesk for that fun, techy, yet casual vibe -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --bg-color: #fdf8f5;
+            --main-dark: #1a1a1a;
+            --accent-yellow: #ffde59;
+            --accent-pink: #ff91e4;
+            --accent-cyan: #00e5ff;
+            --accent-green: #00ff7f;
+        }
+
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--main-dark);
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        /* Neo-Brutalism Styling Utility Classes */
+        .neo-border {
+            border: 4px solid var(--main-dark);
+        }
+        
+        .neo-shadow {
+            box-shadow: 8px 8px 0px var(--main-dark);
+            transition: all 0.2s ease-in-out;
+        }
+
+        .neo-shadow:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 10px 10px 0px var(--main-dark);
+        }
+
+        .neo-btn {
+            border: 3px solid var(--main-dark);
+            box-shadow: 5px 5px 0px var(--main-dark);
+            transition: all 0.1s ease-in-out;
+            cursor: pointer;
+        }
+
+        .neo-btn:active {
+            transform: translate(5px, 5px);
+            box-shadow: 0px 0px 0px var(--main-dark);
+        }
+
+        /* Animations */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0px); }
+        }
+
+        .floating {
+            animation: float 4s ease-in-out infinite;
+        }
+
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        .marquee-content {
+            display: flex;
+            width: 200%;
+            animation: marquee 15s linear infinite;
+        }
+
+        /* Scroll Reveal Utility */
+        .reveal {
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 0.8s ease-out;
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Flip Card Styling for Interactive Section */
+        .flip-card {
+            background-color: transparent;
+            perspective: 1000px;
+            height: 350px;
+        }
+
+        .flip-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+
+        .flip-card.flipped .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .flip-card-front, .flip-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden; /* Safari */
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            border-radius: 1rem;
+        }
+
+        .flip-card-front {
+            background-color: white;
+        }
+
+        .flip-card-back {
+            background-color: var(--accent-green);
+            transform: rotateY(180deg);
+        }
+
+        @keyframes pulse-ring {
+            0% { box-shadow: 0 0 0 0 rgba(255, 145, 228, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(255, 145, 228, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 145, 228, 0); }
+        }
+        
+        .speech-btn.playing {
+            animation: pulse-ring 1.5s infinite;
+            background-color: var(--main-dark) !important;
+            color: var(--accent-pink) !important;
+        }
+
+        #game-board {
+            position: relative;
+            width: 100%;
+            height: 350px;
+            background-color: #fdf8f5;
+            border-radius: 1rem;
+            overflow: hidden;
+            cursor: crosshair;
+            border: 4px solid var(--main-dark);
+            background-image: radial-gradient(#d1d5db 2px, transparent 2px);
+            background-size: 30px 30px;
+        }
+        
+        .game-entity {
+            position: absolute;
+            font-size: 3rem;
+            user-select: none;
+            transition: transform 0.1s;
+        }
+        
+        .game-entity:active {
+            transform: scale(0.7);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 12px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-color);
+            border-left: 3px solid var(--main-dark);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent-pink);
+            border: 3px solid var(--main-dark);
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <section class="min-h-screen flex flex-col justify-center items-center relative overflow-hidden px-4 pt-20 pb-10">
+        <!-- Decorative Background Elements -->
+        <div class="absolute top-20 left-10 w-32 h-32 bg-[var(--accent-yellow)] rounded-full neo-border neo-shadow floating" style="animation-delay: 0s;"></div>
+        <div class="absolute bottom-32 right-10 w-40 h-40 bg-[var(--accent-cyan)] rounded-xl rotate-12 neo-border neo-shadow floating" style="animation-delay: 1s;"></div>
+        <div class="absolute top-40 right-20 text-6xl floating" style="animation-delay: 2s;">💡</div>
+        <div class="absolute bottom-40 left-20 text-6xl floating" style="animation-delay: 1.5s;">🔍</div>
+
+        <div class="max-w-4xl w-full text-center z-10">
+            <div class="inline-block bg-[var(--accent-pink)] text-white font-bold py-2 px-6 rounded-full neo-border mb-6 transform -rotate-2">
+                Bukan Sekadar Ngetik Kode!
+            </div>
+            <h1 class="text-6xl md:text-8xl font-bold mb-6 leading-tight">
+                IT ITU DUNIA <br>
+                <span class="bg-[var(--accent-yellow)] px-4 neo-border inline-block transform rotate-1 mt-2">SOLUSI 🚀</span>
+            </h1>
+            <p class="text-xl md:text-2xl text-gray-700 mb-10 max-w-2xl mx-auto font-medium">
+                Sering dikira <i>hacker</i> atau tukang servis printer, padahal keseharian anak IT itu lebih mirip <strong>Detektif</strong> yang nyari akar masalah.
+            </p>
+            
+            <div class="flex flex-col md:flex-row gap-4 justify-center items-center">
+                <a href="#mindset" class="neo-btn bg-white text-xl font-bold py-4 px-8 rounded-xl inline-flex items-center gap-4 text-[var(--main-dark)] hover:bg-[var(--accent-cyan)] transition-colors">
+                    Mulai Investigasi <i class="fa-solid fa-arrow-down"></i>
+                </a>
+                <button onclick="speakText('Halo! Selamat datang di Dunia Solusi. Anak IT itu bukan sekadar ngetik kode, tapi tentang memecahkan masalah. Klik tombol dengerin di setiap bagian untuk panduan suara ya!', this)" class="neo-btn bg-[var(--accent-pink)] text-white text-xl font-bold py-4 px-8 rounded-xl inline-flex items-center gap-4 hover:bg-[var(--main-dark)] transition-colors speech-btn">
+                    <i class="fa-solid fa-volume-high"></i> Dengerin Pemandu AI
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <div class="w-full bg-[var(--main-dark)] text-white py-4 overflow-hidden border-y-4 border-[var(--main-dark)] flex items-center">
+        <div class="marquee-content font-bold text-2xl flex gap-10 whitespace-nowrap">
+            <span>💻 CODING IS JUST A TOOL</span>
+            <span>✨ PROBLEM SOLVING IS THE SKILL</span>
+            <span>💻 CODING IS JUST A TOOL</span>
+            <span>✨ PROBLEM SOLVING IS THE SKILL</span>
+            <span>💻 CODING IS JUST A TOOL</span>
+            <span>✨ PROBLEM SOLVING IS THE SKILL</span>
+        </div>
+    </div>
+
+    <section id="mindset" class="py-24 px-4 max-w-6xl mx-auto">
+        <div class="text-center mb-16 reveal">
+            <h2 class="text-5xl font-bold mb-4">Mitos vs Fakta Lapangan</h2>
+            <p class="text-xl">Apa yang orang bayangin vs apa yang sebenarnya terjadi di otak kita.</p>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-10">
+            <!-- Mitos -->
+            <div class="bg-white rounded-2xl p-8 neo-border neo-shadow reveal">
+                <div class="bg-red-100 text-red-600 font-bold py-1 px-4 rounded-full inline-block mb-4 border-2 border-red-600">Ekspektasi Orang</div>
+                <h3 class="text-3xl font-bold mb-4">"Ngetik Cepet Kayak Hacker di Film"</h3>
+                <div class="text-7xl mb-6">🧑‍💻🔥</div>
+                <p class="text-lg text-gray-700">Pokoknya layar item, tulisan ijo jalan cepet banget. Masalah selesai dengan ngetik ratusan baris kode tanpa henti.</p>
+            </div>
+
+            <!-- Fakta -->
+            <div class="bg-[var(--accent-yellow)] rounded-2xl p-8 neo-border neo-shadow reveal" style="transition-delay: 0.2s;">
+                <div class="bg-green-100 text-green-700 font-bold py-1 px-4 rounded-full inline-block mb-4 border-2 border-green-700">Realita Anak IT</div>
+                <h3 class="text-3xl font-bold mb-4">"Bengong Sejam Mikirin Logika"</h3>
+                <div class="text-7xl mb-6">🤔☕</div>
+                <p class="text-lg text-gray-700">Lebih banyak dengerin masalah user, merenung di depan kopi, dan nyoret-nyoret <i>flowchart</i> di kertas atau <i>whiteboard</i>. Kode cuma eksekusi akhirnya aja.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-24 px-4 bg-[var(--main-dark)] text-white">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-16 reveal">
+                <h2 class="text-5xl font-bold mb-4">3 Skill Rahasia (Non-Teknis)</h2>
+                <p class="text-xl text-gray-300">Senjata utama yang nggak diajarin di buku tutorial *coding* manapun.</p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Skill 1 -->
+                <div class="bg-white text-[var(--main-dark)] rounded-2xl p-8 neo-border neo-shadow hover:-translate-y-4 transition-transform duration-300 reveal">
+                    <div class="w-16 h-16 rounded-full bg-[var(--accent-cyan)] border-4 border-[var(--main-dark)] flex items-center justify-center text-3xl mb-6">
+                        🧐
+                    </div>
+                    <h3 class="text-2xl font-bold mb-3">Kepo Maksimal</h3>
+                    <p class="font-medium">User ngeluh "Aplikasi lambat!" Kita nggak langsung ngecek server, tapi nanya: "Lambatnya pas ngapain? Pake koneksi apa? Jam berapa?"</p>
+                </div>
+
+                <!-- Skill 2 -->
+                <div class="bg-white text-[var(--main-dark)] rounded-2xl p-8 neo-border neo-shadow hover:-translate-y-4 transition-transform duration-300 reveal" style="transition-delay: 0.2s;">
+                    <div class="w-16 h-16 rounded-full bg-[var(--accent-pink)] border-4 border-[var(--main-dark)] flex items-center justify-center text-3xl mb-6">
+                        🧩
+                    </div>
+                    <h3 class="text-2xl font-bold mb-3">Logika Ninja</h3>
+                    <p class="font-medium">Jago nyambungin benang merah dari masalah yang kelihatan sepele jadi satu sistem besar yang saling berkaitan. Solusi yang utuh.</p>
+                </div>
+
+                <!-- Skill 3 -->
+                <div class="bg-white text-[var(--main-dark)] rounded-2xl p-8 neo-border neo-shadow hover:-translate-y-4 transition-transform duration-300 reveal" style="transition-delay: 0.4s;">
+                    <div class="w-16 h-16 rounded-full bg-[var(--accent-yellow)] border-4 border-[var(--main-dark)] flex items-center justify-center text-3xl mb-6">
+                        💡
+                    </div>
+                    <h3 class="text-2xl font-bold mb-3">Kreativitas Liar</h3>
+                    <p class="font-medium">Terkadang solusi terbaik itu bukan bikin aplikasi baru yang mahal, tapi cukup bikin script otomatisasi yang simpel banget. *Out of the box!*</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-24 px-4 bg-[var(--accent-cyan)] text-[var(--main-dark)] border-y-4 border-[var(--main-dark)]">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-16 reveal">
+                <h2 class="text-5xl font-bold mb-4">Flashcard Mindset IT 📇</h2>
+                <p class="text-xl font-medium mb-6">Hafalin konsep emas ini biar lu makin jago mecahin masalah! (Klik kartu untuk membalik)</p>
+                <button onclick="speakText('Di sini ada flashcard tentang mindset problem solving IT. Seperti Root Cause Analysis, Divide and Conquer, dan MVP Mindset. Coba klik kartunya untuk melihat penjelasan detailnya.', this)" class="text-lg font-bold bg-white py-2 px-6 rounded-full neo-border neo-shadow hover:bg-[var(--accent-pink)] hover:text-white transition-colors speech-btn inline-flex items-center gap-2">
+                    <i class="fa-solid fa-play"></i> Panduan Suara
+                </button>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Flashcard 1 -->
+                <div class="flip-card reveal" onclick="this.classList.toggle('flipped')">
+                    <div class="flip-card-inner neo-border neo-shadow rounded-2xl cursor-pointer">
+                        <div class="flip-card-front bg-white">
+                            <h3 class="text-3xl font-bold">Root Cause Analysis</h3>
+                            <p class="text-gray-500 mt-2 font-medium">(Analisis Akar Masalah)</p>
+                        </div>
+                        <div class="flip-card-back bg-[var(--accent-yellow)]">
+                            <p class="text-lg font-bold px-4">Jangan cuma nambal gejala. Server penuh? Jangan cuma beli storage baru, cari tau aplikasi apa yang bikin datanya bengkak (mungkin ada bug log).</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Flashcard 2 -->
+                <div class="flip-card reveal" style="transition-delay: 0.2s;" onclick="this.classList.toggle('flipped')">
+                    <div class="flip-card-inner neo-border neo-shadow rounded-2xl cursor-pointer">
+                        <div class="flip-card-front bg-white">
+                            <h3 class="text-3xl font-bold">Divide & Conquer</h3>
+                            <p class="text-gray-500 mt-2 font-medium">(Pecah & Selesaikan)</p>
+                        </div>
+                        <div class="flip-card-back bg-[var(--accent-pink)] text-white">
+                            <p class="text-lg font-bold px-4">Error sistem itu kompleks. Pecah jadi kecil-kecil: Cek jaringannya dulu, lalu databasenya, baru kodenya. Selesaiin satu-satu!</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Flashcard 3 -->
+                <div class="flip-card reveal" style="transition-delay: 0.4s;" onclick="this.classList.toggle('flipped')">
+                    <div class="flip-card-inner neo-border neo-shadow rounded-2xl cursor-pointer">
+                        <div class="flip-card-front bg-white">
+                            <h3 class="text-3xl font-bold">MVP Mindset</h3>
+                            <p class="text-gray-500 mt-2 font-medium">(Minimum Viable Product)</p>
+                        </div>
+                        <div class="flip-card-back bg-white">
+                            <p class="text-lg font-bold px-4">Buat solusi yang paling sederhana dulu buat ngetes apakah beneran nyelesain masalah klien. Jangan langsung bikin yang super mahal dan canggih.</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Flashcard 4 -->
+                <div class="flip-card reveal" onclick="this.classList.toggle('flipped')">
+                    <div class="flip-card-inner neo-border neo-shadow rounded-2xl cursor-pointer">
+                        <div class="flip-card-front bg-white">
+                            <h3 class="text-3xl font-bold">Rubber Duck Debugging</h3>
+                            <p class="text-gray-500 mt-2 font-medium">(Cerita ke Bebek Karet)</p>
+                        </div>
+                        <div class="flip-card-back bg-[var(--accent-cyan)] text-[var(--main-dark)]">
+                            <p class="text-lg font-bold px-4">Mentok nyari error? Coba jelasin kode/masalah lu baris demi baris ke benda mati (kayak bebek karet). Seringkali lu bakal nemu sendiri salahnya pas lagi cerita.</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Flashcard 5 -->
+                <div class="flip-card reveal" style="transition-delay: 0.2s;" onclick="this.classList.toggle('flipped')">
+                    <div class="flip-card-inner neo-border neo-shadow rounded-2xl cursor-pointer">
+                        <div class="flip-card-front bg-white">
+                            <h3 class="text-3xl font-bold">Fail Fast</h3>
+                            <p class="text-gray-500 mt-2 font-medium">(Gagal Lebih Cepat)</p>
+                        </div>
+                        <div class="flip-card-back bg-[var(--accent-green)] text-[var(--main-dark)]">
+                            <p class="text-lg font-bold px-4">Bikin sistem lu nge-error atau ngasih peringatan secepat mungkin kalau ada yang salah, daripada jalan terus tapi tau-tau datanya berantakan di akhir.</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Flashcard 6 -->
+                <div class="flip-card reveal" style="transition-delay: 0.4s;" onclick="this.classList.toggle('flipped')">
+                    <div class="flip-card-inner neo-border neo-shadow rounded-2xl cursor-pointer">
+                        <div class="flip-card-front bg-white">
+                            <h3 class="text-3xl font-bold">DRY Principle</h3>
+                            <p class="text-gray-500 mt-2 font-medium">(Don't Repeat Yourself)</p>
+                        </div>
+                        <div class="flip-card-back bg-black text-white">
+                            <p class="text-lg font-bold px-4">Kalau lu ngelakuin hal yang sama 3 kali secara manual, itu tandanya lu butuh script otomatisasi. Jangan buang waktu ngerjain tugas robot.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-24 px-4 bg-white">
+        <div class="max-w-4xl mx-auto">
+            <div class="text-center mb-10 reveal">
+                <div class="inline-block bg-[var(--accent-green)] text-[var(--main-dark)] font-bold py-2 px-6 rounded-full mb-4 neo-border transform -rotate-2">
+                    Waktunya Praktek! 🎮
+                </div>
+                <h2 class="text-5xl font-bold mb-4">Mini Game: Basmi Bug Server!</h2>
+                <p class="text-xl text-gray-700 mb-6">Sebagai detektif IT, tugas lu nangkap "Bug" (🐛) yang bikin server down. Hati-hati jangan sampai klik "Fitur" (✨)!</p>
+                <div class="flex justify-center gap-4">
+                    <button onclick="speakText('Ayo main game basmi bug! Klik icon serangga secepat mungkin sebelum waktunya habis untuk dapat poin. Ingat, jangan klik icon bintang karena itu adalah fitur penting yang bakal ngurangin poin lu.', this)" class="text-lg font-bold bg-[var(--main-dark)] text-white py-2 px-6 rounded-full hover:bg-[var(--accent-pink)] transition-colors speech-btn inline-flex items-center gap-2">
+                        <i class="fa-solid fa-headset"></i> Penjelasan Game
+                    </button>
+                    <!-- Tombol Refresh Game manual di luar arena -->
+                    <button id="reset-game-btn" onclick="resetAndStartGame()" class="hidden text-lg font-bold bg-[var(--accent-cyan)] text-[var(--main-dark)] py-2 px-6 rounded-full hover:scale-105 transition-transform inline-flex items-center gap-2">
+                        <i class="fa-solid fa-rotate-right"></i> Main Lagi
+                    </button>
+                </div>
+            </div>
+
+            <div class="neo-border neo-shadow rounded-3xl p-6 bg-[var(--accent-yellow)] reveal">
+                <div class="flex justify-between items-center mb-4 px-4 bg-white py-3 rounded-xl neo-border">
+                    <div class="text-2xl font-bold">Skor: <span id="game-score" class="text-[var(--accent-pink)] text-3xl">0</span></div>
+                    <div class="text-2xl font-bold">Sisa Waktu: <span id="game-time" class="text-red-500 text-3xl">15</span>s</div>
+                </div>
+                
+                <div id="game-board" class="neo-shadow relative">
+                    <div id="game-overlay" class="absolute inset-0 bg-black/80 flex flex-col justify-center items-center z-10 text-white backdrop-blur-sm">
+                        <h3 class="text-4xl font-bold mb-4">Siap Amankan Server?</h3>
+                        <p class="mb-6 font-medium">Klik 🐛 (+10 Poin) | Jangan Klik ✨ (-5 Poin)</p>
+                        <button onclick="resetAndStartGame()" class="neo-btn bg-[var(--accent-green)] text-[var(--main-dark)] text-2xl font-bold py-3 px-10 rounded-xl hover:scale-105 transition-transform">🚀 Mulai Scan!</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-24 px-4 bg-[var(--bg-color)] border-t-4 border-[var(--main-dark)]">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-16 reveal">
+                <div class="inline-block bg-black text-white font-bold py-2 px-6 rounded-full mb-4 transform rotate-2">
+                    Studi Kasus 🕵️‍♂️
+                </div>
+                <h2 class="text-5xl font-bold mb-4">Bongkar Kasus Klien!</h2>
+                <p class="text-xl">Seringkali klien datang bawa "solusi", tugas kita adalah nemuin "masalah aslinya".<br><strong>Klik tombol Investigasi</strong> untuk cari tahu kebenarannya!</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-10">
+                <!-- Kasus 1 -->
+                <div class="flip-card reveal" id="card1">
+                    <div class="flip-card-inner neo-border neo-shadow rounded-2xl">
+                        <!-- Front (Request Klien) -->
+                        <div class="flip-card-front">
+                            <h3 class="text-xl font-bold text-gray-500 mb-2 uppercase tracking-wide">Permintaan Klien:</h3>
+                            <p class="text-2xl font-bold mb-6">"Mas, tolong bikinin tombol 'Beli' nya kedap-kedip warna merah neon dong!"</p>
+                            <button onclick="flipCard('card1')" class="neo-btn bg-[var(--accent-yellow)] font-bold py-3 px-8 rounded-xl text-lg">
+                                🔍 Mulai Investigasi
+                            </button>
+                        </div>
+                        <!-- Back (Masalah Asli) -->
+                        <div class="flip-card-back text-[var(--main-dark)]">
+                            <h3 class="text-xl font-bold mb-2 uppercase tracking-wide">Masalah Aslinya:</h3>
+                            <p class="text-2xl font-bold mb-4">User nggak sadar ada tombol Beli karena warna tombol nyaru sama background.</p>
+                            <div class="bg-white/50 p-4 rounded-xl border-2 border-black font-medium mb-6">
+                                <strong>Solusi IT:</strong> Gak perlu dibikin kedap-kedip norak. Cukup ubah kontras warna tombol dan perbaiki *layout* UI/UX.
+                            </div>
+                            <button onclick="flipCard('card1')" class="neo-btn bg-white font-bold py-2 px-6 rounded-xl">
+                                Tutup Kasus
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Kasus 2 -->
+                <div class="flip-card reveal" style="transition-delay: 0.2s;" id="card2">
+                    <div class="flip-card-inner neo-border neo-shadow rounded-2xl">
+                        <!-- Front (Request Klien) -->
+                        <div class="flip-card-front">
+                            <h3 class="text-xl font-bold text-gray-500 mb-2 uppercase tracking-wide">Permintaan Klien:</h3>
+                            <p class="text-2xl font-bold mb-6">"Bro, kita butuh aplikasi Android, iOS, dan Web secepatnya buat absen karyawan!"</p>
+                            <button onclick="flipCard('card2')" class="neo-btn bg-[var(--accent-cyan)] font-bold py-3 px-8 rounded-xl text-lg">
+                                🔍 Mulai Investigasi
+                            </button>
+                        </div>
+                        <!-- Back (Masalah Asli) -->
+                        <div class="flip-card-back text-[var(--main-dark)]" style="background-color: var(--accent-pink);">
+                            <h3 class="text-xl font-bold mb-2 uppercase tracking-wide">Masalah Aslinya:</h3>
+                            <p class="text-2xl font-bold mb-4">Karyawannya cuma 5 orang dan sering kerja di luar. Boss cuma butuh rekap lokasi.</p>
+                            <div class="bg-white/50 p-4 rounded-xl border-2 border-black font-medium mb-6">
+                                <strong>Solusi IT:</strong> Ngapain bikin 3 aplikasi mahal? Buat aja sistem absen via WhatsApp Bot otomatis pake kirim lokasi. Cepat, murah, solutif!
+                            </div>
+                            <button onclick="flipCard('card2')" class="neo-btn bg-white font-bold py-2 px-6 rounded-xl">
+                                Tutup Kasus
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Kasus 3 -->
+                <div class="flip-card reveal" id="card3">
+                    <div class="flip-card-inner neo-border neo-shadow rounded-2xl">
+                        <!-- Front (Request Klien) -->
+                        <div class="flip-card-front">
+                            <h3 class="text-xl font-bold text-gray-500 mb-2 uppercase tracking-wide">Permintaan Klien:</h3>
+                            <p class="text-2xl font-bold mb-6">"Website kita sering error. Kita butuh beli server baru yang harganya 50 juta biar gak lemot!"</p>
+                            <button onclick="flipCard('card3')" class="neo-btn bg-[var(--accent-green)] font-bold py-3 px-8 rounded-xl text-lg">
+                                🔍 Mulai Investigasi
+                            </button>
+                        </div>
+                        <!-- Back (Masalah Asli) -->
+                        <div class="flip-card-back text-white" style="background-color: var(--main-dark);">
+                            <h3 class="text-xl font-bold mb-2 uppercase tracking-wide text-gray-400">Masalah Aslinya:</h3>
+                            <p class="text-2xl font-bold mb-4">Server yang lama kerjanya berat gara-gara ada gambar ukuran 10MB yang di-load berulang kali.</p>
+                            <div class="bg-white/10 p-4 rounded-xl border-2 border-white font-medium mb-6">
+                                <strong>Solusi IT:</strong> Nggak butuh server 50 juta. Cukup kompres ukurang gambar jadi 100kb, website langsung wuss lancar. Hemat duit klien!
+                            </div>
+                            <button onclick="flipCard('card3')" class="neo-btn bg-white text-[var(--main-dark)] font-bold py-2 px-6 rounded-xl">
+                                Tutup Kasus
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Kasus 4 -->
+                <div class="flip-card reveal" style="transition-delay: 0.2s;" id="card4">
+                    <div class="flip-card-inner neo-border neo-shadow rounded-2xl">
+                        <!-- Front (Request Klien) -->
+                        <div class="flip-card-front">
+                            <h3 class="text-xl font-bold text-gray-500 mb-2 uppercase tracking-wide">Permintaan Klien:</h3>
+                            <p class="text-2xl font-bold mb-6">"Bikinin sistem AI dong buat jawab pertanyaan pelanggan, kompetitor sebelah udah pada pake AI nih!"</p>
+                            <button onclick="flipCard('card4')" class="neo-btn bg-[var(--accent-pink)] text-white font-bold py-3 px-8 rounded-xl text-lg hover:text-[var(--main-dark)]">
+                                🔍 Mulai Investigasi
+                            </button>
+                        </div>
+                        <!-- Back (Masalah Asli) -->
+                        <div class="flip-card-back text-[var(--main-dark)]" style="background-color: var(--accent-cyan);">
+                            <h3 class="text-xl font-bold mb-2 uppercase tracking-wide">Masalah Aslinya:</h3>
+                            <p class="text-2xl font-bold mb-4">Pelanggan cuma nanya hal repetitif kayak "Jam buka jam berapa?" dan "Alamat toko dimana?".</p>
+                            <div class="bg-white/50 p-4 rounded-xl border-2 border-black font-medium mb-6">
+                                <strong>Solusi IT:</strong> Gak usah buang-buang waktu bikin AI mahal. Bikin halaman FAQ (Tanya Jawab) yang gampang dicari, masalah selesai. Jangan kemakan FOMO (Fear of Missing Out)!
+                            </div>
+                            <button onclick="flipCard('card4')" class="neo-btn bg-white font-bold py-2 px-6 rounded-xl">
+                                Tutup Kasus
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-24 px-4 bg-white relative overflow-hidden">
+        <div class="absolute w-full h-full inset-0 z-0 opacity-10" style="background-image: radial-gradient(circle at 2px 2px, black 1px, transparent 0); background-size: 32px 32px;"></div>
+        
+        <div class="max-w-4xl mx-auto text-center relative z-10 reveal">
+            <h2 class="text-6xl font-bold mb-8">Jadi, IT itu tentang...</h2>
+            
+            <div class="bg-[var(--accent-yellow)] neo-border neo-shadow p-10 rounded-3xl transform rotate-1 mb-10">
+                <p class="text-3xl md:text-5xl font-bold leading-tight">
+                    "Mempermudah hidup orang lain melalui teknologi."
+                </p>
+            </div>
+            
+            <p class="text-xl font-medium text-gray-700 max-w-2xl mx-auto">
+                Setiap <i>bug</i> yang kita fix, setiap sistem yang dibikin otomatis, itu ngurangin pusingnya banyak orang di luar sana. 
+                <br><br>
+                <span class="text-2xl font-bold text-[var(--main-dark)] bg-[var(--accent-cyan)] px-2">Bangga jadi Problem Solver! 🦸‍♂️🦸‍♀️</span>
+            </p>
+        </div>
+    </section>
+
+    <footer class="bg-[var(--main-dark)] text-white text-center py-10 border-t-4 border-black">
+        <p class="text-lg font-bold">Dibuat dengan ❤️ dan ☕ untuk para pencari solusi.</p>
+        <p class="text-gray-400 mt-2 text-sm">Design inspired by Neo-Brutalism & Interactive Web Storytelling</p>
+    </footer>
+
+    <script>
+        let currentUtterance = null;
+
+        function speakText(text, btnElement) {
+            // Cek apakah browser support Speech API
+            if ('speechSynthesis' in window) {
+                // Hentikan suara kalau lagi ngomong
+                if (window.speechSynthesis.speaking) {
+                    window.speechSynthesis.cancel();
+                    document.querySelectorAll('.speech-btn').forEach(btn => btn.classList.remove('playing'));
+                    
+                    // Kalau ngeklik tombol yang sama buat stop, langsung return
+                    if (currentUtterance && currentUtterance.text === text) {
+                        currentUtterance = null;
+                        return;
+                    }
+                }
+
+                currentUtterance = new SpeechSynthesisUtterance(text);
+                currentUtterance.lang = 'id-ID'; // Set bahasa Indonesia
+                currentUtterance.rate = 1.0;     // Kecepatan normal
+                currentUtterance.pitch = 1.1;    // Sedikit lebih tinggi biar ceria
+                
+                currentUtterance.onstart = () => {
+                    btnElement.classList.add('playing');
+                };
+                
+                currentUtterance.onend = () => {
+                    btnElement.classList.remove('playing');
+                    currentUtterance = null;
+                };
+                
+                currentUtterance.onerror = () => {
+                    btnElement.classList.remove('playing');
+                    currentUtterance = null;
+                };
+
+                window.speechSynthesis.speak(currentUtterance);
+            } else {
+                // Fallback kalau browser nggak support
+                const fallbackMsg = document.createElement('div');
+                fallbackMsg.innerText = "Yahh, browser kamu belum support fitur Suara AI nih!";
+                fallbackMsg.className = "fixed top-5 left-1/2 transform -translate-x-1/2 bg-red-500 text-white px-6 py-3 rounded-xl neo-border neo-shadow z-50 font-bold";
+                document.body.appendChild(fallbackMsg);
+                setTimeout(() => fallbackMsg.remove(), 3000);
+            }
+        }
+
+        let score = 0;
+        let timeLeft = 15;
+        let gameTimer = null;
+        let bugSpawner = null;
+        
+        const gameBoard = document.getElementById('game-board');
+        const scoreDisplay = document.getElementById('game-score');
+        const timeDisplay = document.getElementById('game-time');
+        const overlay = document.getElementById('game-overlay');
+        const resetBtn = document.getElementById('reset-game-btn');
+
+        function resetAndStartGame() {
+            // Bersihkan timer sebelumnya jika ada
+            if (gameTimer) clearInterval(gameTimer);
+            if (bugSpawner) clearInterval(bugSpawner);
+            
+            // Sembunyikan tombol reset di luar (opsional)
+            resetBtn.classList.add('hidden');
+            
+            // Reset state
+            score = 0;
+            timeLeft = 15;
+            scoreDisplay.innerText = score;
+            timeDisplay.innerText = timeLeft;
+            overlay.classList.add('hidden');
+            gameBoard.innerHTML = ''; // Bersihkan arena
+            
+            // Pasang ulang overlay untuk dipakai saat game over nanti
+            gameBoard.appendChild(overlay);
+            
+            // Mulai Timer Hitung Mundur
+            gameTimer = setInterval(() => {
+                timeLeft--;
+                timeDisplay.innerText = timeLeft;
+                if(timeLeft <= 0) {
+                    endGame();
+                }
+            }, 1000);
+
+            // Mulai memunculkan entitas
+            spawnEntities();
+            bugSpawner = setInterval(spawnEntities, 700); 
+        }
+
+        function spawnEntities() {
+            if(timeLeft <= 0) return;
+            
+            const entity = document.createElement('div');
+            // 75% kemungkinan munculin Bug, 25% munculin Fitur
+            const isBug = Math.random() > 0.25; 
+            
+            entity.classList.add('game-entity');
+            entity.innerText = isBug ? '🐛' : '✨';
+            
+            // Hitung posisi random di dalam container
+            const maxX = gameBoard.clientWidth - 60;
+            const maxY = gameBoard.clientHeight - 60;
+            const x = Math.floor(Math.random() * maxX);
+            const y = Math.floor(Math.random() * maxY);
+            
+            entity.style.left = `${x}px`;
+            entity.style.top = `${y}px`;
+            
+            // Interaksi klik
+            entity.onmousedown = function() {
+                if(isBug) {
+                    score += 10;
+                    this.innerText = '💥'; // Animasi hancur
+                } else {
+                    score -= 5;
+                    this.innerText = '❌'; // Tanda salah
+                }
+                scoreDisplay.innerText = score;
+                this.onmousedown = null; // Biar nggak diklik dua kali
+                
+                // Hapus elemen setelah diklik
+                setTimeout(() => this.remove(), 150);
+            };
+            
+            gameBoard.appendChild(entity);
+            
+            // Hapus otomatis kalau nggak diklik dalam 1.5 detik
+            setTimeout(() => {
+                if(entity.parentNode) {
+                    entity.style.opacity = '0';
+                    setTimeout(() => entity.remove(), 200);
+                }
+            }, 1500);
+        }
+
+        function endGame() {
+            clearInterval(gameTimer);
+            clearInterval(bugSpawner);
+            
+            // Hapus semua entitas yang tersisa, tapi jangan hapus overlay
+            const entities = gameBoard.querySelectorAll('.game-entity');
+            entities.forEach(el => el.remove());
+            
+            overlay.classList.remove('hidden');
+            
+            // Tampilkan tombol reset tambahan di atas arena
+            resetBtn.classList.remove('hidden');
+            
+            let message = score > 100 ? "Lu Legend! Server Aman 🏆" : "Server Masih Lag Nih 😅";
+            
+            overlay.innerHTML = `
+                <h3 class="text-4xl font-bold mb-2">Waktu Habis!</h3>
+                <p class="text-2xl mb-2">${message}</p>
+                <p class="text-2xl mb-6 bg-black text-white px-4 py-1 rounded">Total Skor: <span class="text-[var(--accent-yellow)] font-bold">${score}</span></p>
+                <button onclick="resetAndStartGame()" class="neo-btn bg-[var(--accent-pink)] text-white text-xl font-bold py-3 px-8 rounded-xl hover:bg-white hover:text-[var(--main-dark)] transition-colors">Main Lagi Dong</button>
+            `;
+        }
+
+        // Function to flip the interactive cards
+        function flipCard(cardId) {
+            const card = document.getElementById(cardId);
+            card.classList.toggle('flipped');
+        }
+
+        // Scroll Reveal Animation Logic
+        document.addEventListener('DOMContentLoaded', () => {
+            const reveals = document.querySelectorAll('.reveal');
+
+            const revealOnScroll = () => {
+                const windowHeight = window.innerHeight;
+                const elementVisible = 100; // Trigger threshold
+
+                reveals.forEach((reveal) => {
+                    const elementTop = reveal.getBoundingClientRect().top;
+                    
+                    if (elementTop < windowHeight - elementVisible) {
+                        reveal.classList.add('active');
+                    }
+                });
+            };
+
+            // Trigger once on load
+            revealOnScroll();
+
+            // Trigger on scroll
+            window.addEventListener('scroll', revealOnScroll);
+        });
+    </script>
+</body>
+</html>
